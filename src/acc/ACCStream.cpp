@@ -79,7 +79,7 @@ void ACCStream<T>::copy()
   T * restrict a = this->a;
   T * restrict c = this->c;
   #pragma tuner start copy a(T*:array_size) c(T*:array_size) array_size(int:array_size)
-  #pragma acc parallel present(a[0:array_size], c[0:array_size]) wait
+  #pragma acc parallel COPY_TUNABLE_OPENACC present(a[0:array_size], c[0:array_size]) wait
   #pragma acc loop
   for (int i = 0; i < array_size; i++)
   {
