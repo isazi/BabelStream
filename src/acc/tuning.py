@@ -9,13 +9,15 @@ from kernel_tuner.utils.directives import (
     extract_directive_code,
     generate_directive_function,
     extract_directive_data,
-    extract_preprocessor
+    extract_preprocessor,
 )
 
 
 def command_line() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--arraysize", help="Size of the arrays", type=int, default=2**25)
+    parser.add_argument(
+        "--arraysize", help="Size of the arrays", type=int, default=2**25
+    )
     parser.add_argument("--float", help="Use single precision", action="store_true")
     return parser.parse_args()
 
@@ -58,7 +60,7 @@ code = generate_directive_function(
     functions["copy"],
     app,
     data=data["copy"],
-    user_dimensions=user_dimensions
+    user_dimensions=user_dimensions,
 )
 if arguments.float:
     a = np.random.randn(size).astype(np.float32)
@@ -70,7 +72,7 @@ args = [a, c]
 answer = [None, a]
 
 tune_params = dict()
-tune_params["vlength"] = [32*i for i in range(1, 33)]
+tune_params["vlength"] = [32 * i for i in range(1, 33)]
 metrics = dict()
 metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
@@ -94,7 +96,7 @@ code = generate_directive_function(
     functions["mul"],
     app,
     data=data["mul"],
-    user_dimensions=user_dimensions
+    user_dimensions=user_dimensions,
 )
 if arguments.float:
     c = np.random.randn(size).astype(np.float32)
@@ -106,7 +108,7 @@ args = [b, c]
 answer = [c * scalar, None]
 
 tune_params.clear()
-tune_params["vlength"] = [32*i for i in range(1, 33)]
+tune_params["vlength"] = [32 * i for i in range(1, 33)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
@@ -131,7 +133,7 @@ code = generate_directive_function(
     functions["add"],
     app,
     data=data["add"],
-    user_dimensions=user_dimensions
+    user_dimensions=user_dimensions,
 )
 if arguments.float:
     a = np.random.randn(size).astype(np.float32)
@@ -145,7 +147,7 @@ args = [a, b, c]
 answer = [None, None, a + b]
 
 tune_params.clear()
-tune_params["vlength"] = [32*i for i in range(1, 33)]
+tune_params["vlength"] = [32 * i for i in range(1, 33)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
@@ -171,7 +173,7 @@ code = generate_directive_function(
     functions["triad"],
     app,
     data=data["triad"],
-    user_dimensions=user_dimensions
+    user_dimensions=user_dimensions,
 )
 if arguments.float:
     a = np.zeros(size).astype(np.float32)
@@ -185,7 +187,7 @@ args = [a, b, c]
 answer = [b + (scalar * c), None, None]
 
 tune_params.clear()
-tune_params["vlength"] = [32*i for i in range(1, 33)]
+tune_params["vlength"] = [32 * i for i in range(1, 33)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
