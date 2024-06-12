@@ -14,11 +14,6 @@
 
 #include <openacc.h>
 
-#ifndef kernel_tuner
-#define COPY_TUNABLE_OPENACC ""
-#else
-#define COPY_TUNABLE_OPENACC "vector_length(vlength)"
-#endif
 #define IMPLEMENTATION_STRING "OpenACC"
 
 template <class T>
