@@ -144,11 +144,18 @@ void ACCStream<T>::triad()
   T * restrict a = this->a;
   T * restrict b = this->b;
   T * restrict c = this->c;
-  #pragma acc parallel loop present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+  #pragma tuner start triad a(T*:array_size) b(T*:array_size) c(T*:array_size)
+#ifndef kernel_tuner
+  #pragma acc parallel present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+#else
+  #pragma acc parallel vector_length(vlength) present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+#endif
+  #pragma acc loop
   for (int i = 0; i < array_size; i++)
   {
     a[i] = b[i] + scalar * c[i];
   }
+  #pragma tuner stop
 }
 
 template <class T>

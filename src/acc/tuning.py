@@ -42,7 +42,10 @@ compiler_options = [
 app = Code(OpenACC(), Cxx())
 preprocessor = extract_preprocessor(source)
 preprocessor.append(f"#define T {real_type}\n")
-preprocessor.append(f"#define scalar {scalar}\n")
+if arguments.float:
+    preprocessor.append(f"#define scalar {scalar}f\n")
+else:
+    preprocessor.append(f"#define scalar {scalar}\n")
 signatures = extract_directive_signature(source, app)
 functions = extract_directive_code(source, app)
 data = extract_directive_data(source, app)
@@ -147,6 +150,45 @@ metrics.clear()
 metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
+
+tune_kernel(
+    "add",
+    code,
+    0,
+    args,
+    tune_params,
+    answer=answer,
+    metrics=metrics,
+    compiler_options=compiler_options,
+    compiler="nvc++",
+)
+
+# Triad
+print("Tuning triad")
+code = generate_directive_function(
+    preprocessor,
+    signatures["triad"],
+    functions["triad"],
+    app,
+    data=data["triad"],
+    user_dimensions=user_dimensions
+)
+if arguments.float:
+    a = np.zeros(size).astype(np.float32)
+    b = np.random.randn(size).astype(np.float32)
+    c = np.random.randn(size).astype(np.float32)
+else:
+    a = np.zeros(size).astype(np.float64)
+    b = np.random.randn(size).astype(np.float64)
+    c = np.random.randn(size).astype(np.float64)
+args = [a, b, c]
+answer = [b + (scalar * c), None, None]
+
+tune_params.clear()
+tune_params["vlength"] = [32*i for i in range(1, 33)]
+metrics.clear()
+metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
+metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
 tune_kernel(
     "add",
