@@ -111,6 +111,7 @@ void ACCStream<T>::mul()
   {
     b[i] = scalar * c[i];
   }
+#pragma tuner stop
 }
 
 template <class T>
