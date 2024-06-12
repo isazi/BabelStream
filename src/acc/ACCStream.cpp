@@ -102,7 +102,7 @@ void ACCStream<T>::mul()
   T * restrict c = this->c;
   #pragma tuner start mul b(T*:array_size) c(T*:array_size)
 #ifndef kernel_tuner
-  #pragma acc parallel loop present(b[0:array_size], c[0:array_size]) wait
+  #pragma acc parallel present(b[0:array_size], c[0:array_size]) wait
 #else
   #pragma acc parallel vector_length(vlength) present(b[0:array_size], c[0:array_size]) wait
 #endif
@@ -121,11 +121,18 @@ void ACCStream<T>::add()
   T * restrict a = this->a;
   T * restrict b = this->b;
   T * restrict c = this->c;
-  #pragma acc parallel loop present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+  #pragma tuner start add a(T*:array_size) b(T*:array_size) c(T*:array_size)
+#ifndef kernel_tuner
+  #pragma acc parallel present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+#else
+  #pragma acc parallel vector_length(vlength) present(a[0:array_size], b[0:array_size], c[0:array_size]) wait
+#endif
+  #pragma acc loop
   for (int i = 0; i < array_size; i++)
   {
     c[i] = a[i] + b[i];
   }
+  #pragma tuner stop
 }
 
 template <class T>

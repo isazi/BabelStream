@@ -119,3 +119,43 @@ tune_kernel(
     compiler_options=compiler_options,
     compiler="nvc++",
 )
+
+# Add
+print("Tuning add")
+code = generate_directive_function(
+    preprocessor,
+    signatures["add"],
+    functions["add"],
+    app,
+    data=data["add"],
+    user_dimensions=user_dimensions
+)
+if arguments.float:
+    a = np.random.randn(size).astype(np.float32)
+    b = np.random.randn(size).astype(np.float32)
+    c = np.zeros(size).astype(np.float32)
+else:
+    a = np.random.randn(size).astype(np.float64)
+    b = np.random.randn(size).astype(np.float64)
+    c = np.zeros(size).astype(np.float64)
+args = [a, b, c]
+answer = [None, None, a + b]
+
+tune_params.clear()
+tune_params["vlength"] = [32*i for i in range(1, 33)]
+metrics.clear()
+metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
+metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
+
+
+tune_kernel(
+    "add",
+    code,
+    0,
+    args,
+    tune_params,
+    answer=answer,
+    metrics=metrics,
+    compiler_options=compiler_options,
+    compiler="nvc++",
+)
