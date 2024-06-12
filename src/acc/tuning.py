@@ -22,6 +22,7 @@ def command_line() -> argparse.Namespace:
 
 arguments = command_line()
 size = np.int32(arguments.arraysize)
+scalar = 0.4
 real_type = "double"
 real_bytes = 8
 if arguments.float:
@@ -37,11 +38,11 @@ compiler_options = [
     "-I.",
     "-I..",
 ]
-metrics = dict()
 
 app = Code(OpenACC(), Cxx())
 preprocessor = extract_preprocessor(source)
 preprocessor.append(f"#define T {real_type}\n")
+preprocessor.append(f"#define scalar {scalar}\n")
 signatures = extract_directive_signature(source, app)
 functions = extract_directive_code(source, app)
 data = extract_directive_data(source, app)
@@ -67,10 +68,48 @@ answer = [None, a]
 
 tune_params = dict()
 tune_params["vlength"] = [32*i for i in range(1, 33)]
+metrics = dict()
 metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
 tune_kernel(
     "copy",
+    code,
+    0,
+    args,
+    tune_params,
+    answer=answer,
+    metrics=metrics,
+    compiler_options=compiler_options,
+    compiler="nvc++",
+)
+
+# Mul
+print("Tuning mul")
+code = generate_directive_function(
+    preprocessor,
+    signatures["mul"],
+    functions["mul"],
+    app,
+    data=data["mul"],
+    user_dimensions=user_dimensions
+)
+if arguments.float:
+    c = np.random.randn(size).astype(np.float32)
+    b = np.zeros(size).astype(np.float32)
+else:
+    c = np.random.randn(size).astype(np.float64)
+    b = np.zeros(size).astype(np.float64)
+args = [b, c]
+answer = [c * scalar, None]
+
+tune_params.clear()
+tune_params["vlength"] = [32*i for i in range(1, 33)]
+metrics.clear()
+metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
+metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
+
+tune_kernel(
+    "mul",
     code,
     0,
     args,

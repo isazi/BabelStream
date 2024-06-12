@@ -100,7 +100,13 @@ void ACCStream<T>::mul()
   int array_size = this->array_size;
   T * restrict b = this->b;
   T * restrict c = this->c;
+  #pragma tuner start mul b(T*:array_size) c(T*:array_size)
+#ifndef kernel_tuner
   #pragma acc parallel loop present(b[0:array_size], c[0:array_size]) wait
+#else
+  #pragma acc parallel vector_length(vlength) present(b[0:array_size], c[0:array_size]) wait
+#endif
+  #pragma acc loop
   for (int i = 0; i < array_size; i++)
   {
     b[i] = scalar * c[i];
