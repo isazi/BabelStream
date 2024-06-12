@@ -62,8 +62,8 @@ if arguments.float:
 else:
     a = np.random.randn(size).astype(np.float64)
     c = np.zeros(size).astype(np.float64)
-args = [a, c, size]
-answer = [None, a, None]
+args = [a, c]
+answer = [None, a]
 
 tune_params = dict()
 tune_params["vlength"] = [32*i for i in range(1, 33)]
@@ -76,6 +76,7 @@ tune_kernel(
     args,
     tune_params,
     answer=answer,
+    metrics=metrics,
     compiler_options=compiler_options,
     compiler="nvc++",
 )
