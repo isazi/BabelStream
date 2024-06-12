@@ -77,5 +77,5 @@ tune_kernel(
     tune_params,
     answer=answer,
     compiler_options=compiler_options,
-    compiler="nvfortran",
+    compiler="nvc++",
 )
