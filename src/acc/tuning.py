@@ -193,7 +193,46 @@ metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
 tune_kernel(
-    "add",
+    "triad",
+    code,
+    0,
+    args,
+    tune_params,
+    answer=answer,
+    metrics=metrics,
+    compiler_options=compiler_options,
+    compiler="nvc++",
+)
+
+# Dot
+print("Tuning dot")
+code = generate_directive_function(
+    preprocessor,
+    signatures["dot"],
+    functions["dot"],
+    app,
+    data=data["dot"],
+    user_dimensions=user_dimensions,
+)
+if arguments.float:
+    dotsum = np.float32(0)
+    a = np.zeros(size).astype(np.float32)
+    b = np.random.randn(size).astype(np.float32)
+else:
+    dotsum = np.float64(0)
+    a = np.zeros(size).astype(np.float64)
+    b = np.random.randn(size).astype(np.float64)
+args = [dotsum, a, b]
+answer = [np.sum(a * b), None, None]
+
+tune_params.clear()
+tune_params["vlength"] = [32 * i for i in range(1, 33)]
+metrics.clear()
+metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
+metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
+
+tune_kernel(
+    "dot",
     code,
     0,
     args,

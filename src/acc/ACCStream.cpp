@@ -182,12 +182,18 @@ T ACCStream<T>::dot()
   int array_size = this->array_size;
   T * restrict a = this->a;
   T * restrict b = this->b;
-  #pragma acc parallel loop reduction(+:sum) present(a[0:array_size], b[0:array_size]) wait
+  #pragma tuner start dot sum(T:0) a(T*:array_size) b(T*:array_size)
+#ifndef kernel_tuner
+  #pragma acc parallel reduction(+:sum) present(a[0:array_size], b[0:array_size]) wait
+#else
+  #pragma acc parallel vector_length(vlength) reduction(+:sum) present(a[0:array_size], b[0:array_size]) wait
+#endif
+  #pragma acc loop
   for (int i = 0; i < array_size; i++)
   {
     sum += a[i] * b[i];
   }
-
+  #pragma tuner stop
   return sum;
 }
 
