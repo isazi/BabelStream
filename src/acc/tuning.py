@@ -223,7 +223,6 @@ else:
     a = np.random.randn(size).astype(np.float64)
     b = np.random.randn(size).astype(np.float64)
 args = [dotsum, a, b]
-answer = [np.sum(a * b), None, None]
 
 tune_params.clear()
 tune_params["vlength"] = [32 * i for i in range(1, 33)]
@@ -237,7 +236,6 @@ tune_kernel(
     0,
     args,
     tune_params,
-    answer=answer,
     metrics=metrics,
     compiler_options=compiler_options,
     compiler="nvc++",
