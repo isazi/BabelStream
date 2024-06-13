@@ -216,11 +216,11 @@ code = generate_directive_function(
 )
 if arguments.float:
     dotsum = np.float32(0)
-    a = np.zeros(size).astype(np.float32)
+    a = np.random.randn(size).astype(np.float32)
     b = np.random.randn(size).astype(np.float32)
 else:
     dotsum = np.float64(0)
-    a = np.zeros(size).astype(np.float64)
+    a = np.random.randn(size).astype(np.float64)
     b = np.random.randn(size).astype(np.float64)
 args = [dotsum, a, b]
 answer = [np.sum(a * b), None, None]
