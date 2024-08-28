@@ -74,7 +74,7 @@ answer = [None, a]
 
 tune_params = dict()
 tune_params["nthreads"] = [32 * i for i in range(1, 33)]
-tune_params["slength"] = [2**i for i in range(1, 6)]
+tune_params["slength"] = [2**i for i in range(0, 5)]
 metrics = dict()
 metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
 
