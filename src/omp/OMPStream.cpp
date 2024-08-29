@@ -264,7 +264,7 @@ T OMPStream<T>::dot()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum)
 #else
-  #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum)
+  #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum) num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
   #pragma omp parallel for reduction(+:sum)
