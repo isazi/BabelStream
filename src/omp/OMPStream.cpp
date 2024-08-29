@@ -107,12 +107,13 @@ void OMPStream<T>::copy()
   T *c = this->c;
 #endif // OMP_TARGET_GPU
   #pragma tuner start copy a(T*:array_size) c(T*:array_size)
+#ifdef OMP_TARGET_GPU
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
-#ifndef OMP_TARGET_GPU
+#else
   #pragma omp parallel for
 #endif // OMP_TARGET_GPU
   for (int i = 0; i < array_size; i++)
@@ -136,10 +137,17 @@ void OMPStream<T>::mul()
   int array_size = this->array_size;
   T *b = this->b;
   T *c = this->c;
+#endif // OMP_TARGET_GPU
+  #pragma tuner start mul b(T*:array_size) c(T*:array_size)
+#ifdef OMP_TARGET_GPU
+#ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
-  #pragma omp parallel for
+  #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif
+#else
+  #pragma omp parallel for
+#endif // OMP_TARGET_GPU
   for (int i = 0; i < array_size; i++)
   {
     b[i] = scalar * c[i];
@@ -149,6 +157,7 @@ void OMPStream<T>::mul()
   // a small copy to ensure blocking so that timing is correct
   #pragma omp target update from(c[0:0])
   #endif
+  #pragma tuner stop
 }
 
 template <class T>
