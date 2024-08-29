@@ -144,7 +144,7 @@ void OMPStream<T>::mul()
   #pragma omp target teams distribute parallel for simd
 #else
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
-#endif
+#endif // kernel_tuner
 #else
   #pragma omp parallel for
 #endif // OMP_TARGET_GPU
@@ -168,10 +168,17 @@ void OMPStream<T>::add()
   T *a = this->a;
   T *b = this->b;
   T *c = this->c;
+#endif // OMP_TARGET_GPU
+  #pragma tuner start add a(T*:array_size) b(T*:array_size) c(T*:array_size)
+#ifdef OMP_TARGET_GPU
+#ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
+#endif // kernel_tuner
+#else
   #pragma omp parallel for
-#endif
+#endif // OMP_TARGET_GPU
   for (int i = 0; i < array_size; i++)
   {
     c[i] = a[i] + b[i];
@@ -181,6 +188,7 @@ void OMPStream<T>::add()
   // a small copy to ensure blocking so that timing is correct
   #pragma omp target update from(a[0:0])
   #endif
+  #pragma tuner stop
 }
 
 template <class T>
@@ -193,10 +201,17 @@ void OMPStream<T>::triad()
   T *a = this->a;
   T *b = this->b;
   T *c = this->c;
+#endif // OMP_TARGET_GPU
+  #pragma tuner start triad a(T*:array_size) b(T*:array_size) c(T*:array_size)
+#ifdef OMP_TARGET_GPU
+#ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
+#endif // kernel_tuner
+#else
   #pragma omp parallel for
-#endif
+#endif // OMP_TARGET_GPU
   for (int i = 0; i < array_size; i++)
   {
     a[i] = b[i] + scalar * c[i];
@@ -206,6 +221,7 @@ void OMPStream<T>::triad()
   // a small copy to ensure blocking so that timing is correct
   #pragma omp target update from(a[0:0])
   #endif
+  #pragma tuner stop
 }
 
 template <class T>
@@ -242,14 +258,22 @@ T OMPStream<T>::dot()
   int array_size = this->array_size;
   T *a = this->a;
   T *b = this->b;
+#endif // OMP_TARGET_GPU
+  #pragma tuner start dot sum(T:0) a(T*:array_size) b(T*:array_size)
+#ifdef OMP_TARGET_GPU
+#ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum)
 #else
+  #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum)
+#endif // kernel_tuner
+#else
   #pragma omp parallel for reduction(+:sum)
-#endif
+#endif // OMP_TARGET_GPU
   for (int i = 0; i < array_size; i++)
   {
     sum += a[i] * b[i];
   }
+  #pragma tuner stop
 
   return sum;
 }

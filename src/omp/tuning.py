@@ -150,7 +150,8 @@ args = [a, b, c]
 answer = [None, None, a + b]
 
 tune_params.clear()
-tune_params["vlength"] = [32 * i for i in range(1, 33)]
+tune_params["nthreads"] = [32 * i for i in range(1, 33)]
+tune_params["slength"] = [2**i for i in range(0, 5)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
@@ -190,7 +191,8 @@ args = [a, b, c]
 answer = [b + (scalar * c), None, None]
 
 tune_params.clear()
-tune_params["vlength"] = [32 * i for i in range(1, 33)]
+tune_params["nthreads"] = [32 * i for i in range(1, 33)]
+tune_params["slength"] = [2**i for i in range(0, 5)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (3 * real_bytes * size / 10**9) / (p["time"] / 10**3)
@@ -228,7 +230,8 @@ else:
 args = [dotsum, a, b]
 
 tune_params.clear()
-tune_params["vlength"] = [32 * i for i in range(1, 33)]
+tune_params["nthreads"] = [32 * i for i in range(1, 33)]
+tune_params["slength"] = [2**i for i in range(0, 5)]
 metrics.clear()
 metrics["GFLOP/s"] = lambda p: (2 * size / 10**9) / (p["time"] / 10**3)
 metrics["GB/s"] = lambda p: (2 * real_bytes * size / 10**9) / (p["time"] / 10**3)
