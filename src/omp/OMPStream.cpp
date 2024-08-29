@@ -111,6 +111,7 @@ void OMPStream<T>::copy()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  omp_set_dynamic(0);
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
@@ -143,6 +144,7 @@ void OMPStream<T>::mul()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  omp_set_dynamic(0);
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
@@ -174,6 +176,7 @@ void OMPStream<T>::add()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  omp_set_dynamic(0);
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
@@ -207,6 +210,7 @@ void OMPStream<T>::triad()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd
 #else
+  omp_set_dynamic(0);
   #pragma omp target teams distribute parallel for simd num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
@@ -264,6 +268,7 @@ T OMPStream<T>::dot()
 #ifndef kernel_tuner
   #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum)
 #else
+  omp_set_dynamic(0);
   #pragma omp target teams distribute parallel for simd map(tofrom: sum) reduction(+:sum) num_threads(nthreads) simdlen(slength)
 #endif // kernel_tuner
 #else
