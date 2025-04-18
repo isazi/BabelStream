@@ -11,14 +11,16 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <kmm/kmm.hpp>
+
 #include "Stream.h"
 
-#define IMPLEMENTATION_STRING "CUDA"
+#define IMPLEMENTATION_STRING "KMM"
 
 #define TBSIZE 1024
 
 template <class T>
-class CUDAStream : public Stream<T>
+class KMMStream : public Stream<T>
 {
   protected:
     // Size of arrays
@@ -38,8 +40,8 @@ class CUDAStream : public Stream<T>
 
   public:
 
-    CUDAStream(const int, const int);
-    ~CUDAStream();
+    KMMStream(const int, const int);
+    ~KMMStream();
 
     virtual void copy() override;
     virtual void add() override;

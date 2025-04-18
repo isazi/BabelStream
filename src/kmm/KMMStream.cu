@@ -6,7 +6,7 @@
 // source code
 
 
-#include "CUDAStream.h"
+#include "KMMStream.h"
 
 void check_error(void)
 {
@@ -19,7 +19,8 @@ void check_error(void)
 }
 
 template <class T>
-CUDAStream<T>::CUDAStream(const int ARRAY_SIZE, const int device_index)
+CUDAKMMStream<T>::KMMStream(const int ARRAY_SIZE, const int device_index)
+CUDAKMMStream<T>::KMMStream(const int ARRAY_SIZE, const int device_index)
 {
 
   // The array size must be divisible by TBSIZE for kernel launches
@@ -99,7 +100,7 @@ CUDAStream<T>::CUDAStream(const int ARRAY_SIZE, const int device_index)
 
 
 template <class T>
-CUDAStream<T>::~CUDAStream()
+KMMStream<T>::~CUDAKMMStream()
 {
   free(sums);
 
@@ -131,7 +132,7 @@ __global__ void init_kernel(T * a, T * b, T * c, T initA, T initB, T initC)
 }
 
 template <class T>
-void CUDAStream<T>::init_arrays(T initA, T initB, T initC)
+void KMMStream<T>::init_arrays(T initA, T initB, T initC)
 {
   init_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c, initA, initB, initC);
   check_error();
@@ -140,7 +141,7 @@ void CUDAStream<T>::init_arrays(T initA, T initB, T initC)
 }
 
 template <class T>
-void CUDAStream<T>::read_arrays(std::vector<T>& a, std::vector<T>& b, std::vector<T>& c)
+void KMMStream<T>::read_arrays(std::vector<T>& a, std::vector<T>& b, std::vector<T>& c)
 {
   // Copy device memory to host
 #if defined(PAGEFAULT) || defined(MANAGED)
@@ -170,7 +171,7 @@ __global__ void copy_kernel(const T * a, T * c)
 }
 
 template <class T>
-void CUDAStream<T>::copy()
+void KMMStream<T>::copy()
 {
   copy_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_c);
   check_error();
@@ -187,7 +188,7 @@ __global__ void mul_kernel(T * b, const T * c)
 }
 
 template <class T>
-void CUDAStream<T>::mul()
+void KMMStream<T>::mul()
 {
   mul_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_b, d_c);
   check_error();
@@ -203,7 +204,7 @@ __global__ void add_kernel(const T * a, const T * b, T * c)
 }
 
 template <class T>
-void CUDAStream<T>::add()
+void KMMStream<T>::add()
 {
   add_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c);
   check_error();
@@ -220,7 +221,7 @@ __global__ void triad_kernel(T * a, const T * b, const T * c)
 }
 
 template <class T>
-void CUDAStream<T>::triad()
+void KMMStream<T>::triad()
 {
   triad_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c);
   check_error();
@@ -237,7 +238,7 @@ __global__ void nstream_kernel(T * a, const T * b, const T * c)
 }
 
 template <class T>
-void CUDAStream<T>::nstream()
+void KMMStream<T>::nstream()
 {
   nstream_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c);
   check_error();
@@ -271,7 +272,7 @@ __global__ void dot_kernel(const T * a, const T * b, T * sum, int array_size)
 }
 
 template <class T>
-T CUDAStream<T>::dot()
+T KMMStream<T>::dot()
 {
   dot_kernel<<<dot_num_blocks, TBSIZE>>>(d_a, d_b, d_sum, array_size);
   check_error();
@@ -341,5 +342,5 @@ std::string getDeviceDriver(const int device)
   return std::to_string(driver);
 }
 
-template class CUDAStream<float>;
-template class CUDAStream<double>;
+template class KMMStream<float>;
+template class KMMStream<double>;

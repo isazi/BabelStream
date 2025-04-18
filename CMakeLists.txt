@@ -153,7 +153,6 @@ register_model(std-indices STD_INDICES STDIndicesStream.cpp)
 register_model(std-ranges STD_RANGES STDRangesStream.cpp)
 register_model(hip HIP HIPStream.cpp)
 register_model(cuda CUDA CUDAStream.cu)
-register_model(cuda_kmm CUDA_KMM CUDAStream.cu)
 register_model(kokkos KOKKOS KokkosStream.cpp)
 register_model(sycl SYCL SYCLStream.cpp)
 register_model(sycl2020-acc SYCL2020 SYCLStream2020.cpp)
@@ -164,6 +163,7 @@ register_model(raja USE_RAJA RAJAStream.cpp)
 register_model(tbb TBB TBBStream.cpp)
 register_model(thrust THRUST ThrustStream.cu) # Thrust uses cu, even for rocThrust
 register_model(futhark FUTHARK FutharkStream.cpp)
+register_model(kmm USE_KMM KMMStream.cu)
 
 
 set(USAGE ON CACHE BOOL "Whether to print all custom flags for the selected model")

@@ -3,12 +3,6 @@ register_flag_optional(CMAKE_CXX_COMPILER
         "Any CXX compiler that is supported by CMake detection, this is used for host compilation"
         "c++")
 
-register_flag_optional(MEM "Device memory mode:
-        DEFAULT   - allocate host and device memory pointers.
-        MANAGED   - use CUDA Managed Memory.
-        PAGEFAULT - shared memory, only host pointers allocated."
-        "DEFAULT")
-
 register_flag_required(CMAKE_CUDA_COMPILER
         "Path to the CUDA nvcc compiler")
 
